@@ -2,7 +2,14 @@
   "name": "rx-http-kit",
   "version": "1.0.0",
   "description": "HTTP Client Development Kit based by rxjs",
-  "main": "index.js",
+  "main": "lib/index.js",
+  "module": "lib/index.es.js",
+  "files": [
+    "lib",
+    "types",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "format": "prettier --write --cache .",
@@ -10,8 +17,10 @@
     "typecheck": "tsc -p scripts --noEmit && tsc -p playground --noEmit",
     "build": "pnpm -r --filter=./packages/* run build",
     "dev": "pnpm -r --parallel --filter=./packages/* run dev",
+    "rollup": "tsc && rollup -c",
     "release": "tsx scripts/release.ts",
-    "ci-publish": "tsx scripts/publishCI.ts"
+    "ci-publish": "tsx scripts/publishCI.ts",
+    "test": "tsc -p ./tsconfig-test.json && mocha 'test/dist/**/*.spec.js'"
   },
   "repository": {
     "type": "git",
@@ -44,20 +53,36 @@
     "packageExtensions": {}
   },
   "dependencies": {
-    "rxjs": "^7.5.5"
+    "rxjs": "^7.5.5",
+    "xhr2": "^0.2.1"
   },
   "devDependencies": {
+    "@rollup/plugin-node-resolve": "^13.3.0",
     "@rollup/plugin-typescript": "^8.3.3",
+    "@types/chai": "^4.3.1",
+    "@types/mocha": "^9.1.1",
+    "chai": "^4.3.6",
     "esbuild": "^0.14.47",
     "eslint": "^8.18.0",
+    "mocha": "^10.0.0",
     "pnpm": "^7.4.0",
     "prettier": "^2.7.1",
     "rollup": "^2.75.7",
+    "ts-node": "^10.8.1",
+    "tslib": "^2.4.0",
     "tsx": "^3.6.0",
     "typescript": "^4.7.4"
   },
   "optionalDependencies": {
-    "axios": "^0.27.2",
-    "xhr2": "^0.2.1"
-  }
+    "axios": "^0.27.2"
+  },
+  "peerDependencies": {
+    "axios": "^0.27.2"
+  },
+  "peerDependenciesMeta": {
+    "axios": {
+      "optional": true
+    }
+  },
+  "types": "types/index.d.ts"
 }

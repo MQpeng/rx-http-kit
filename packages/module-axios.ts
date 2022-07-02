@@ -4,7 +4,7 @@ import { HttpClient } from './client';
 import { AxiosFactory, HttpAxiosBackend } from './axios';
 import Axios, { AxiosInstance } from 'axios';
 
-export class ServerAxios implements AxiosFactory {
+export class AxiosBuilder implements AxiosFactory {
   build(): AxiosInstance {
     return Axios;
   }
@@ -14,7 +14,7 @@ export class HttpAxiosModule implements HttpModule {
   httpInterceptor: HttpInterceptingHandler;
   constructor(private handler: HttpInterceptor[] = []) {
     this.httpInterceptor = new HttpInterceptingHandler(
-      new HttpAxiosBackend(new ServerAxios()),
+      new HttpAxiosBackend(new AxiosBuilder()),
       this.handler
     );
   }

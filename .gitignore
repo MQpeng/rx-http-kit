@@ -6,6 +6,7 @@
 *.log
 /.vscode/
 dist
+lib
 dist-ssr
 explorations
 node_modules
