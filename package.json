@@ -1,6 +1,6 @@
 {
   "name": "rx-http-kit",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "HTTP Client Development Kit based by rxjs",
   "main": "lib/index.js",
   "module": "lib/index.es.js",
@@ -17,7 +17,8 @@
     "test:compile": "tsc -p ./tsconfig-test.json",
     "test:server": "npm run test:compile && node test/dist/server.js",
     "test:mocha": "mocha 'test/dist/*.spec.js'",
-    "types": "tsc -p ./tsconfig-types.json"
+    "types": "tsc -p ./tsconfig.types.json",
+    "prepublishOnly": "npm run rollup && npm run types"
   },
   "repository": {
     "type": "git",

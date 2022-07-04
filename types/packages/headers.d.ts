@@ -103,4 +103,7 @@ export declare class HttpHeaders {
      * @internal
      */
     forEach(fn: (name: string, values: string[]) => void): void;
+    toObject(): {
+        [key: string]: string[];
+    };
 }
