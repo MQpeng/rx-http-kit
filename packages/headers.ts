@@ -259,4 +259,12 @@ export class HttpHeaders {
       fn(this.normalizedNames.get(key)!, this.headers.get(key)!)
     );
   }
+
+  toObject(): { [key: string]: string[] } {
+    const result: { [key: string]: string[] } = {};
+    this.headers?.forEach((value, key) => {
+      result[key] = value;
+    });
+    return result;
+  }
 }
