@@ -1,12 +1,12 @@
 # Rx-Http-Kit
 
-Rx-Http-kit based in RxJS, provides axios、xhr2、xhr backend. If you have used Angular's HttpClient, you will definitely be sighing the convenience of the style of RxJS. It supports NodeJs & Browser env.
+Rx-Http-kit based in RxJS, provides axios、xhr2、xhr backend. If you have used Angular's HttpClient, You will definitely feel the convenience of RxJS. It supports NodeJs & Browser env.
 
 Lets go!
 
 # Quick Start
 
-> some sample is in `test` dir, [Quick Test](https://github.com/MQpeng/rx-http-kit/tree/main/test)
+> More usage samples can be found in the test directory. [(Quick Test Dir)](https://github.com/MQpeng/rx-http-kit/tree/main/test)
 
 ```
 npm install -S rx-http-kit
@@ -53,6 +53,85 @@ httpClient.get<CommonResponse>('/')
   error(err) {
   }
 })
+```
+
+# Custom Backend (UniApp)
+```typescript
+import { HttpClient } from 'rx-http-kit';
+export class UniBackend extends HttpBackend {
+    handle(req: HttpRequest<any>): Observable<HttpEvent<any>> {
+        return new Observable((observer: Observer<HttpEvent<any>>) => {
+            uni.request({
+                url: req.urlWithParams,
+                data: req.body,
+                method: req.method as any,
+                withCredentials: req.withCredentials,
+                header: req,
+                success: (result: UniApp.RequestSuccessCallbackResult) => {
+                    let status = result.statusCode;
+                    const _header = new HttpHeaders(result.header);
+                    observer.next(
+                        new HttpHeaderResponse({
+                            headers: _header,
+                            status: result.statusCode,
+                            url: req.url,
+                        })
+                    );
+                    let body: any | null = null;
+                    if (status !== HttpStatusCode.NoContent) {
+                        // Use XMLHttpRequest.response if set, responseText otherwise.
+                        body = result.data;
+                    }
+                    if (status === 0) {
+                        status = !!body ? HttpStatusCode.Ok : 0;
+                    }
+                    let ok = status >= 200 && status < 300;
+                    if (ok) {
+                        observer.next(
+                            new HttpResponse({
+                                body,
+                                headers: _header,
+                                status,
+                                url: req.url,
+                            })
+                        );
+                        observer.complete();
+                    } else {
+                        observer.error(
+                            new HttpErrorResponse({
+                                error: body,
+                                headers: _header,
+                                status,
+                                url: req.url,
+                            })
+                        );
+                    }
+                },
+                fail: (result: UniApp.GeneralCallbackResult) => {
+                    const res = new HttpErrorResponse({
+                        error: result.errMsg,
+                        url: req.url,
+                    });
+                    observer.error(res);
+                },
+            });
+        });
+    }
+}
+
+export class HttpUniModule implements HttpModule {
+  httpInterceptor: HttpInterceptingHandler;
+  constructor(private handler: HttpInterceptor[] = []) {
+    this.httpInterceptor = new HttpInterceptingHandler(
+      new UniBackend(),
+      this.handler
+    );
+  }
+
+  getHttpClient() {
+    return new HttpClient(this.httpInterceptor);
+  }
+}
 ```
 
 # Interception

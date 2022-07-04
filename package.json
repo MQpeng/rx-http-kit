@@ -1,6 +1,6 @@
 {
   "name": "rx-http-kit",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "HTTP Client Development Kit based by rxjs",
   "main": "lib/index.js",
   "module": "lib/index.es.js",
