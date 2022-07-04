@@ -57,7 +57,7 @@ export class HttpAxiosBackend implements HttpBackend {
         data: req.body,
         headers: headers,
         responseType: req.responseType,
-        params: req.params,
+        params: req.params?.toObject(),
         withCredentials: req.withCredentials,
         onDownloadProgress: (event: ProgressEvent) => {
           if (!req.reportProgress) return;

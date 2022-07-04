@@ -2,13 +2,34 @@
  * Root tsconfig file for use in all tests.
  */
 {
-  "extends": "./tsconfig.json",
   "compilerOptions": {
-    "baseUrl": "./test",
-    "rootDir": "./test",
-    "outDir": "test/dist",
+    // Setting the "baseUrl" to a different directory than "packages/" because otherwise
+    // packages like the native "http" module are resolved to the Angular "http" package.
+    "baseUrl": "test",
+    "declaration": true,
+    "downlevelIteration": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "module": "CommonJS",
-    "target": "ES2020",
+    "target": "es2020",
+    "strict": true,
+    "moduleResolution": "node",
+    "strictNullChecks": true,
+    "strictPropertyInitialization": false,
+    "outDir": "test/dist",
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noImplicitAny": false,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "rootDir": "test",
+    "lib": [
+      "es2020",
+      "dom"
+    ],
+    "inlineSourceMap": true,
+    "skipDefaultLibCheck": true,
+    "skipLibCheck": true
   },
   "include": [
     "test"
