@@ -1,6 +1,6 @@
 {
   "name": "rx-http-kit",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "HTTP Client Development Kit based by rxjs",
   "main": "lib/index.js",
   "module": "lib/index.es.js",
@@ -11,15 +11,9 @@
     "LICENSE"
   ],
   "scripts": {
-    "preinstall": "npx only-allow pnpm",
     "format": "prettier --write --cache .",
-    "lint": "eslint --cache packages/*/{src,types,__tests__}/** playground/**/__tests__/**/*.ts scripts/**",
-    "typecheck": "tsc -p scripts --noEmit && tsc -p playground --noEmit",
-    "build": "pnpm -r --filter=./packages/* run build",
-    "dev": "pnpm -r --parallel --filter=./packages/* run dev",
+    "lint": "eslint --cache packages/*/{src,types,__tests__}/**",
     "rollup": "tsc && rollup -c",
-    "release": "tsx scripts/release.ts",
-    "ci-publish": "tsx scripts/publishCI.ts",
     "test:compile": "tsc -p ./tsconfig-test.json",
     "test:server": "npm run test:compile && node test/dist/server.js",
     "test:mocha": "mocha 'test/dist/*.spec.js'"
