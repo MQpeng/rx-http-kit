@@ -270,7 +270,7 @@ export declare class HttpErrorResponse extends HttpResponseBase implements Error
  * As per https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
  * @publicApi
  */
-export declare const enum HttpStatusCode {
+export declare enum HttpStatusCode {
     Continue = 100,
     SwitchingProtocols = 101,
     Processing = 102,
