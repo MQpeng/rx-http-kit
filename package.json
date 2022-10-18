@@ -17,6 +17,7 @@
     "test:compile": "tsc -p ./tsconfig-test.json",
     "test:server": "npm run test:compile && node test/dist/server.js",
     "test:mocha": "mocha 'test/dist/*.spec.js'",
+    "test": "npm run test:mocha",
     "types": "tsc -p ./tsconfig.types.json",
     "prepublishOnly": "npm run rollup && npm run types"
   },
