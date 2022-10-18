@@ -57,7 +57,15 @@ httpClient.get<CommonResponse>('/')
 
 # Custom Backend (UniApp)
 ```typescript
-import { HttpClient } from 'rx-http-kit';
+import {
+  HttpClient, HttpBackend, HttpRequest, HttpEvent, HttpHeaders,
+  HttpHeaderResponse, HttpStatusCode,
+  HttpResponse,HttpErrorResponse,HttpModule,HttpInterceptingHandler,HttpInterceptor,HttpHandler,HttpResponseBase
+} from 'rx-http-kit';
+import { catchError, mergeMap, Observable, Observer, of, throwError } from "rxjs";
+import { Storage } from '@util/storage';
+import {Config} from '@config'
+
 export class UniBackend extends HttpBackend {
     handle(req: HttpRequest<any>): Observable<HttpEvent<any>> {
         return new Observable((observer: Observer<HttpEvent<any>>) => {
@@ -66,7 +74,7 @@ export class UniBackend extends HttpBackend {
                 data: req.body,
                 method: req.method as any,
                 withCredentials: req.withCredentials,
-                header: req,
+                header: req.headers.toObject(),
                 success: (result: UniApp.RequestSuccessCallbackResult) => {
                     let status = result.statusCode;
                     const _header = new HttpHeaders(result.header);
@@ -119,6 +127,119 @@ export class UniBackend extends HttpBackend {
     }
 }
 
+export class MyInterceptor implements HttpInterceptor{
+
+  getAdditionalHeaders(headers: HttpHeaders) {
+    const AspMap = {
+        'zh-Hans': 'zh-Hans',
+        en: 'en',
+    };
+    const LangMap = {
+        'zh-Hans': 'zh-CN',
+        en: 'en-US',
+    };
+
+    const SysLangMap = {
+        'zh-CN': 'zh-Hans',
+        zh: 'zh-Hans',
+        zh_CN: 'zh-Hans',
+        'en-US': 'en',
+        en: 'en',
+    };
+    const offset = new Date().getTimezoneOffset() / 60;
+    let systemLanguage: any;
+    // #ifdef H5
+    systemLanguage = navigator.language;
+    // #endif
+    // #ifdef MP-WEIXIN
+    systemLanguage = uni.getSystemInfoSync().language;
+    // #endif
+    let defaultLuang = Storage.getItemSync(Config.i18nLocal) || SysLangMap[systemLanguage] || SysLangMap.zh_CN;
+
+    return {
+      '.aspnetcore.culture': AspMap[defaultLuang],
+      'accept-language': LangMap[defaultLuang],
+      '.Timezone-Offset': offset >= 0 ? `+${offset}` : `${offset}`,
+      Authorization: `Bearer ${Storage.getItemSync('token') || ''}`
+    };
+  }
+
+  intercept(
+    req: HttpRequest<any>,
+    next: HttpHandler
+  ): Observable<HttpEvent<any>> {
+    console.log("🚀 ~ file: rx-http.ts ~ line 112 ~ MyInterceptor ~ req", req)
+    let url = req.url;
+    if (
+      !/assets\//.test(url) &&
+      !url.startsWith('https://') &&
+      !url.startsWith('http://')
+    ) {
+      const baseUrl= Config.baseUrl!;
+      url =
+        baseUrl +
+        (baseUrl.endsWith('/') && url.startsWith('/') ? url.substring(1) : url);
+    }
+
+    const newReq = req.clone({
+      url,
+      setHeaders: this.getAdditionalHeaders(req.headers)
+    });
+    console.log("🚀 ~ file: rx-http.ts ~ line 129 ~ MyInterceptor ~ newReq", newReq)
+    return next.handle(newReq).pipe(
+      mergeMap((ev) => {
+        // Normalization
+        if (ev instanceof HttpResponseBase) {
+          return this.handleData(ev, newReq, next);
+        }
+        // Next
+        return of(ev);
+      }),
+      catchError((err: HttpErrorResponse) => this.handleData(err, newReq, next))
+    );
+  }
+
+  private handleData(ev: HttpResponseBase, req: HttpRequest<any>, next: HttpHandler): Observable<any> {
+    switch (ev.status) {
+      case 200:
+        if (ev instanceof HttpResponse) {
+          const body = ev.body;
+          if (body) {
+            return of(
+              new HttpResponse({
+                body: (body?.result ? body?.result : body) || null,
+                headers: ev.headers,
+                status: ev.status,
+                statusText: ev.statusText,
+                url: ev.url as any
+              })
+            );
+          }
+        }
+        break;
+      case 401:
+        break;
+      case 403:
+      case 404:
+      case 500:
+        break;
+      default:
+        if (ev instanceof HttpErrorResponse) {
+          console.warn(
+            '未可知错误，大部分是由于后端不支持跨域CORS或无效配置引起'
+            ev
+          );
+        }
+        break;
+    }
+    if (ev instanceof HttpErrorResponse) {
+      return throwError(()=> ev);
+    } else {
+      return of(ev);
+    }
+  }
+}
+
 export class HttpUniModule implements HttpModule {
   httpInterceptor: HttpInterceptingHandler;
   constructor(private handler: HttpInterceptor[] = []) {
@@ -132,6 +253,10 @@ export class HttpUniModule implements HttpModule {
     return new HttpClient(this.httpInterceptor);
   }
 }
+
+
+
+export const RxHttpClient = new HttpUniModule([new MyInterceptor()]).getHttpClient();
 ```
 
 # Interception

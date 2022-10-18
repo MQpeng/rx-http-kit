@@ -30,7 +30,10 @@ describe('HttpXHR2Module', function () {
           '/200',
           { id: '123456' },
           {
-            params: { name: 'jack' }
+            params: { name: 'jack' },
+            headers: {
+              abc: 'sdfasdf'
+            }
           }
         ),
         httpClient.delete<CommonResponse>('/200', {

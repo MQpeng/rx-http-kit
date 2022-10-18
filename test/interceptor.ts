@@ -128,6 +128,7 @@ export class MyInterceptor implements HttpInterceptor {
       url,
       setHeaders: this.getAdditionalHeaders(req.headers)
     });
+    console.log("🚀 ~ file: interceptor.ts ~ line 131 ~ MyInterceptor ~ newReq", newReq)
     return next.handle(newReq).pipe(
       mergeMap((ev) => {
         // Normalization

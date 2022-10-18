@@ -1,6 +1,6 @@
 {
   "name": "rx-http-kit",
-  "version": "1.0.11",
+  "version": "1.0.13",
   "description": "HTTP Client Development Kit based by rxjs",
   "main": "lib/index.js",
   "module": "lib/index.es.js",
@@ -17,6 +17,8 @@
     "ci": "pnpm install --no-frozen-lockfile && pnpm run rollup && pnpm link ./",
     "test:compile": "tsc -p ./tsconfig-test.json",
     "test:server": "pnpm run test:compile && forever start test/dist/server.js",
+    "test:server:stop": "forever stop test/dist/server.js",
+    "test:local:server": "pnpm run test:compile && node test/dist/server.js",
     "test:mocha": "mocha 'test/dist/*.spec.js'",
     "test": "pnpm run test:server && pnpm run test:mocha",
     "types": "tsc -p ./tsconfig.types.json",
