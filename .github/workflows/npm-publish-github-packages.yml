@@ -48,6 +48,6 @@ jobs:
         run: pnpm run ci
 
       - name: Run Publish
-        run: pnpm publish --force --no-git-checks
+        run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}

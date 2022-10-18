@@ -20,7 +20,7 @@
     "test:mocha": "mocha 'test/dist/*.spec.js'",
     "test": "pnpm run test:server && pnpm run test:mocha",
     "types": "tsc -p ./tsconfig.types.json",
-    "prepublishOnly": "pnpm run rollup && pnpm run types"
+    "prepublishOnly": "pnpm run types"
   },
   "repository": {
     "type": "git",
