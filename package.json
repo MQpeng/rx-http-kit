@@ -14,11 +14,13 @@
     "format": "prettier --write --cache .",
     "lint": "eslint --cache packages/*/{src,types,__tests__}/**",
     "rollup": "tsc && rollup -c",
+    "ci": "pnpm install --no-frozen-lockfile && pnpm run rollup && pnpm link ./",
     "test:compile": "tsc -p ./tsconfig-test.json",
-    "test:server": "npm run test:compile && node test/dist/server.js",
+    "test:server": "pnpm run test:compile && forever start test/dist/server.js",
     "test:mocha": "mocha 'test/dist/*.spec.js'",
+    "test": "pnpm run test:server && pnpm run test:mocha",
     "types": "tsc -p ./tsconfig.types.json",
-    "prepublishOnly": "npm run rollup && npm run types"
+    "prepublishOnly": "pnpm run rollup && pnpm run types"
   },
   "repository": {
     "type": "git",
@@ -58,13 +60,17 @@
     "xhr2": "^0.2.1"
   },
   "devDependencies": {
+    "@koa/router": "^12.0.0",
     "@rollup/plugin-node-resolve": "^13.3.0",
     "@rollup/plugin-typescript": "^8.3.3",
     "@types/chai": "^4.3.1",
     "@types/mocha": "^9.1.1",
+    "@types/node": "^18.11.0",
     "chai": "^4.3.6",
     "esbuild": "^0.14.47",
     "eslint": "^8.18.0",
+    "forever": "^4.0.3",
+    "koa": "^2.13.4",
     "mocha": "^10.0.0",
     "pnpm": "^7.4.0",
     "prettier": "^2.7.1",
