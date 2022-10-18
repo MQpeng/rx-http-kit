@@ -32,7 +32,8 @@ app
     console.log(
       '🚀 ~ file: server.ts ~ line 41 ~ app.listen ~ request',
       req.method,
-      req.url
+      req.url,
+      req.headers
     );
   })
   .once('listening', (stream) => {
