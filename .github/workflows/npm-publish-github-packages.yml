@@ -44,7 +44,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
+      - name: Run CI
+        run: pnpm run ci
+
       - name: Run Publish
-        run: pnpm publish
+        run: pnpm publish --force
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
