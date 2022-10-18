@@ -9,11 +9,12 @@ on:
 
 jobs:
   publish-npm:
-    needs: build
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
+
+    strategy:
+      matrix:
+        node-version: [14.x]
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
