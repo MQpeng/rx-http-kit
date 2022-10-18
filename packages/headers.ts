@@ -260,10 +260,10 @@ export class HttpHeaders {
     );
   }
 
-  toObject(): { [key: string]: string[] } {
-    const result: { [key: string]: string[] } = {};
-    this.headers?.forEach((value, key) => {
-      result[key] = value;
+  toObject(): { [key: string]: string } {
+    const result: { [key: string]: string } = {};
+    this.forEach((key, value) => {
+      result[key] = value.join(',');
     });
     return result;
   }
