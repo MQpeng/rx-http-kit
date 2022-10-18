@@ -9,11 +9,12 @@ on:
 
 jobs:
   publish-npm:
-    needs: build
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
+
+    strategy:
+      matrix:
+        node-version: [14.x]
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -22,6 +23,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 14
+          registry-url: https://registry.npmjs.org/
 
       - uses: pnpm/action-setup@v2.0.1
         name: Install pnpm
@@ -43,7 +45,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
+      - name: Run CI
+        run: pnpm run ci
+
       - name: Run Publish
-        run: pnpm publish
+        run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
