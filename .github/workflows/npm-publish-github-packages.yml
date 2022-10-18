@@ -15,8 +15,8 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 14
-      - run: npm install
-      - run: npm test
+      - run: pnpm run ci
+      - run: pnpm run test
 
   publish-npm:
     needs: build
@@ -30,7 +30,7 @@ jobs:
         with:
           node-version: 14
           registry-url: https://registry.npmjs.org/
-      - run: npm install
-      - run: npm publish
+      - run: pnpm ci
+      - run: pnpm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
