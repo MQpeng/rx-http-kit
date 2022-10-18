@@ -8,16 +8,6 @@ on:
     types: [created]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 14
-      - run: pnpm run ci
-      - run: pnpm run test
-
   publish-npm:
     needs: build
     runs-on: ubuntu-latest
@@ -25,12 +15,35 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
         with:
           node-version: 14
-          registry-url: https://registry.npmjs.org/
-      - run: pnpm ci
-      - run: pnpm publish
+
+      - uses: pnpm/action-setup@v2.0.1
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Run Publish
+        run: pnpm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
