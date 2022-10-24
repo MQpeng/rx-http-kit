@@ -20,7 +20,8 @@ router.all('/:status', async (ctx) => {
     ctx.body = NormalizeResponse.success(status);
     return;
   }
-  ctx.body = NormalizeResponse.error(status);
+  ctx.throw(status, '', NormalizeResponse.success(status));
+
 });
 
 app.use(router.routes());
@@ -28,14 +29,6 @@ app.use(router.allowedMethods());
 
 app
   .listen(9999)
-  .addListener('request', (req, res) => {
-    console.log(
-      '🚀 ~ file: server.ts ~ line 41 ~ app.listen ~ request',
-      req.method,
-      req.url,
-      req.headers
-    );
-  })
   .once('listening', (stream) => {
     console.log('🚀 ~ test:server is listening', 9999);
   });

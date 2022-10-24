@@ -62,7 +62,7 @@ import {
   HttpHeaderResponse, HttpStatusCode,
   HttpResponse,HttpErrorResponse,HttpModule,HttpInterceptingHandler,HttpInterceptor,HttpHandler,HttpResponseBase
 } from 'rx-http-kit';
-import { catchError, mergeMap, Observable, Observer, of, throwError } from "rxjs";
+import { catchError, first, mergeMap, Observable, Observer, of, throwError } from "rxjs";
 import { Storage } from '@util/storage';
 import {Config} from '@config'
 
@@ -75,16 +75,17 @@ export class UniBackend extends HttpBackend {
                 method: req.method as any,
                 withCredentials: req.withCredentials,
                 header: req.headers.toObject(),
-                success: (result: UniApp.RequestSuccessCallbackResult) => {
+              success: (result: UniApp.RequestSuccessCallbackResult) => {
+
                     let status = result.statusCode;
                     const _header = new HttpHeaders(result.header);
-                    observer.next(
-                        new HttpHeaderResponse({
-                            headers: _header,
-                            status: result.statusCode,
-                            url: req.url,
-                        })
-                    );
+                    // observer.next(
+                    //     new HttpHeaderResponse({
+                    //         headers: _header,
+                    //         status: result.statusCode,
+                    //         url: req.url,
+                    //     })
+                    // );
                     let body: any | null = null;
                     if (status !== HttpStatusCode.NoContent) {
                         // Use XMLHttpRequest.response if set, responseText otherwise.
@@ -168,7 +169,6 @@ export class MyInterceptor implements HttpInterceptor{
     req: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
-    console.log("🚀 ~ file: rx-http.ts ~ line 112 ~ MyInterceptor ~ req", req)
     let url = req.url;
     if (
       !/assets\//.test(url) &&
@@ -185,59 +185,30 @@ export class MyInterceptor implements HttpInterceptor{
       url,
       setHeaders: this.getAdditionalHeaders(req.headers)
     });
-    console.log("🚀 ~ file: rx-http.ts ~ line 129 ~ MyInterceptor ~ newReq", newReq)
     return next.handle(newReq).pipe(
-      mergeMap((ev) => {
-        // Normalization
-        if (ev instanceof HttpResponseBase) {
-          return this.handleData(ev, newReq, next);
-        }
-        // Next
-        return of(ev);
-      }),
-      catchError((err: HttpErrorResponse) => this.handleData(err, newReq, next))
-    );
+      mergeMap(ev => {
+      if (ev instanceof HttpErrorResponse) {
+        return throwError(()=>ev.error);
+      }
+        if (ev instanceof HttpResponse) {
+          let body = ev.body;
+          if (body) {
+            body = (body as any)?.result ? (body as any)?.result : body;
+          }
+        return of(new HttpResponse({
+          body: body,
+          headers: ev.headers,
+          status: ev.status,
+          statusText: ev.statusText,
+          url: ev.url as any
+        }))
+      }
+      return of(ev)
+    }), catchError((err:HttpErrorResponse) => {
+      return throwError(()=>err.error);
+    }))
   }
 
-  private handleData(ev: HttpResponseBase, req: HttpRequest<any>, next: HttpHandler): Observable<any> {
-    switch (ev.status) {
-      case 200:
-        if (ev instanceof HttpResponse) {
-          const body = ev.body;
-          if (body) {
-            return of(
-              new HttpResponse({
-                body: (body?.result ? body?.result : body) || null,
-                headers: ev.headers,
-                status: ev.status,
-                statusText: ev.statusText,
-                url: ev.url as any
-              })
-            );
-          }
-        }
-        break;
-      case 401:
-        break;
-      case 403:
-      case 404:
-      case 500:
-        break;
-      default:
-        if (ev instanceof HttpErrorResponse) {
-          console.warn(
-            '未可知错误，大部分是由于后端不支持跨域CORS或无效配置引起'
-            ev
-          );
-        }
-        break;
-    }
-    if (ev instanceof HttpErrorResponse) {
-      return throwError(()=> ev);
-    } else {
-      return of(ev);
-    }
-  }
 }
 
 export class HttpUniModule implements HttpModule {
@@ -254,9 +225,10 @@ export class HttpUniModule implements HttpModule {
   }
 }
 
-
-
 export const RxHttpClient = new HttpUniModule([new MyInterceptor()]).getHttpClient();
+
+// RxHttpClient.get('/list')
+
 ```
 
 # Interception

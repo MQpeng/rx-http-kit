@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import { HttpXHR2Module, HttpAxiosModule } from 'rx-http-kit';
 import { CommonResponse, MyInterceptor } from './interceptor';
 import { NormalizeResponse } from './common';
-import { forkJoin, merge } from 'rxjs';
+import { catchError, forkJoin, merge, of } from 'rxjs';
 console.log('HttpXHR2Module', typeof HttpXHR2Module);
 
 let rxHttpModule = new HttpXHR2Module([new MyInterceptor()]);
@@ -39,6 +39,9 @@ describe('HttpXHR2Module', function () {
         httpClient.delete<CommonResponse>('/200', {
           params: { id: '123456' }
         }),
+        httpClient.delete<CommonResponse>('/400', {
+          params: { id: '400' }
+        }),
         httpClient.put<CommonResponse>(
           '/200',
           { id: '123456' },
@@ -48,14 +51,18 @@ describe('HttpXHR2Module', function () {
         )
       ]).subscribe({
         next(result) {
+          console.log("🚀 ~ file: node.spec.ts ~ line 57 ~ next ~ result", result)
           assert.equal(result[0].data, 200);
           assert.equal(result[1].data, 200);
           assert.equal(result[2].data, 200);
-          assert.equal(result[3].data, 200);
+          assert.equal(result[3].data, 400);
+          assert.equal(result[4].data, 200);
           done();
         },
         error(err) {
-          done(err);
+          console.log("🚀 ~ file: node.spec.ts ~ line 65 ~ error ~ err", err)
+          assert.equal(err.data, 400);
+          done();
         }
       });
     });

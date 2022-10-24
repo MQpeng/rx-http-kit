@@ -128,7 +128,7 @@ export class MyInterceptor implements HttpInterceptor {
       url,
       setHeaders: this.getAdditionalHeaders(req.headers)
     });
-    console.log("🚀 ~ file: interceptor.ts ~ line 131 ~ MyInterceptor ~ newReq", newReq)
+    // console.log("🚀 ~ file: interceptor.ts ~ line 131 ~ MyInterceptor ~ newReq", newReq)
     return next.handle(newReq).pipe(
       mergeMap((ev) => {
         // Normalization
@@ -138,7 +138,11 @@ export class MyInterceptor implements HttpInterceptor {
         // Next
         return of(ev);
       }),
-      catchError((err: HttpErrorResponse) => this.handleData(err, newReq, next))
+      catchError((err: HttpErrorResponse) => {
+
+        console.log("🚀 ~ file: interceptor.ts ~ line 146 ~ MyInterceptor ~ catchError ~ err", err)
+        return throwError(()=>err.error);
+      })
     );
   }
 }
