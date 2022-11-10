@@ -1,10 +1,20 @@
 # Rx-Http-Kit
 
-Rx-Http-kit based in RxJS, provides axios、xhr2、xhr backend. If you have used Angular's HttpClient, You will definitely feel the convenience of RxJS. It supports NodeJs & Browser env.
+Rx-Http-Kit is a RxJs-based HTTP Client
 
-Lets go!
+## 📖 Introduction
 
-# Quick Start
+Rx-Http-Kit inspired by `Angular`, supports the backend of `Axios`, `XHR`, `UniApp`.
+
+It provides a normalization of `HttpClient` for `NodeJs`, `Browser`, `Mini-App`.
+
+## 🚀 Features:
+- Support multiple backend of http-request: Axios,XHR,UniApp
+- Normalization: just provider a backend, HttpClient is the same
+- Customize Backend
+- Support RxJs
+
+## 🧰 How to install
 
 > More usage samples can be found in the test directory. [(Quick Test Dir)](https://github.com/MQpeng/rx-http-kit/tree/main/test)
 
