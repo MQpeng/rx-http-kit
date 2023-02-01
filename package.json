@@ -1,6 +1,6 @@
 {
   "name": "rx-http-kit",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "A normalized HttpClient based by rxjs",
   "main": "lib/index.js",
   "module": "lib/index.es.js",
@@ -103,5 +103,6 @@
     "axios": {
       "optional": true
     }
-  }
+  },
+  "sideEffects": false
 }
