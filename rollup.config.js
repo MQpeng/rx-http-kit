@@ -14,6 +14,7 @@ export default {
   external,
   output: [
     { format: 'cjs', file: pkg.main, exports: 'auto' },
-    { format: 'esm', file: pkg.module }
+    { format: 'esm', file: pkg.module },
+    { format: 'esm', dir: 'dist', preserveModules: true, },
   ]
 };
